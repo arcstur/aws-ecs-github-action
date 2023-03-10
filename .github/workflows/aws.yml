@@ -1,0 +1,56 @@
+name: Deploy to Amazon ECS with Fargate
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+    - "[0-9]+.[0-9]+.[0-9]+"
+
+env:
+  ECR_REPOSITORY: aws-ecs-fargate-action
+  ECS_CLUSTER: basic-actix-server
+  ECS_SERVICE: basic-actix-server-service
+  
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Get branch names
+      id: branch-name
+      uses: tj-actions/branch-names@v6
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+  
+      # Login to use `docker push`
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ steps.branch-name.outputs.tag }}  # uses the tag name, e.g. "0.4.3"
+      run: |
+        # Tag it twice: one with the version, one with `latest`.
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      # The service's task definition is using the `latest` tag.
+      # Therefore, we only need to restart it, and the task definition can remain unchanged.
+    - name: Update running service
+      id: update-service
+      run: |
+        aws ecs update-service --force-new-deployment --cluster $ECS_CLUSTER --service $ECS_SERVICE
