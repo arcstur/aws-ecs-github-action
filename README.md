@@ -2,7 +2,7 @@
 How to setup a CD for AWS ECS with Fargate
 
 ## Docker
-First, createa an application that has a buildable Docker image.
+First, create an application that has a buildable Docker image.
 
 ## Resources
 Then, create
@@ -24,3 +24,8 @@ The workflow in this repository will run whenever a tag specifying a release-num
 - Tag `latest` with the current version (eg "0.4.3")
 - Push both of them to the ECR registry (creating a new version in the repo, and pointing `latest` to the current version).
 - Force update the service. Since the task definition wont't change (as it uses the `latest` tag, remember?), we need to restart the service, such that it stops the current tasks and creates new ones, therefore using the current `latest` tag.
+
+## Make it better
+Next steps:
+- Make CI run only when source files change (and not the README for example)
+- Make CD run only when CI runs successfully
