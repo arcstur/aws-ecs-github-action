@@ -29,3 +29,4 @@ The workflow in this repository will run whenever a tag specifying a release-num
 Next steps:
 - Make CI run only when source files change (and not the README for example)
 - Make CD run only when CI runs successfully
+- Createa a GitHub release when CD runs
