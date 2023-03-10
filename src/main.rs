@@ -16,14 +16,14 @@ async fn manual_hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("Hello from version 0.0.4");
+    println!("Hello from version 0.0.5");
     HttpServer::new(|| {
         App::new()
             .service(hello)
             .service(echo)
             .route("/hey", web::get().to(manual_hello))
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind(("0.0.0.0", 80))?
     .run()
     .await
 }
