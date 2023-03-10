@@ -16,7 +16,7 @@ async fn manual_hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("Hello from version 0.0.5");
+    println!("Hello from version 0.0.6");
     HttpServer::new(|| {
         App::new()
             .service(hello)
