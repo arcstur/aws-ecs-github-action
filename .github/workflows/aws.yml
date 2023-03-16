@@ -9,7 +9,6 @@ env:
   ECR_REPOSITORY: aws-ecs-fargate-action
   ECS_CLUSTER: basic-actix-server
   ECS_SERVICE: basic-actix-server-service
-  CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
   
 jobs:
   deploy:
